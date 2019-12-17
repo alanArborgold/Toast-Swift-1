@@ -542,7 +542,8 @@ public extension UIView {
  sense to create your own custom UIView subclass and present it with the `showToast`
  methods.
 */
-public struct ToastStyle {
+@objc(ToastStyle)
+public class ToastStyle: NSObject {
 
     public init() {}
     
@@ -696,7 +697,8 @@ public struct ToastStyle {
  `ToastManager` provides general configuration options for all toast
  notifications. Backed by a singleton instance.
 */
-public class ToastManager {
+@objc(ToastManager)
+public class ToastManager: NSObject {
     
     /**
      The `ToastManager` singleton instance.
