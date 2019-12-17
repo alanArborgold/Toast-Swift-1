@@ -28,7 +28,7 @@ import ObjectiveC
 
 /**
  Toast is a Swift extension that adds toast notifications to the `UIView` object class.
- It is intended to be simple, lightweight, and easy to use. Most toast notifications 
+ It is intended to be simple, lightweight, and easy to use. Most toast notifications
  can be triggered with a single line of code.
  
  The `makeToast` methods create a new view and then display it as toast.
@@ -106,7 +106,7 @@ public extension UIView {
      @param completion The completion closure, executed after the toast view disappears.
             didTap will be `true` if the toast view was dismissed from a tap.
      */
-   @objc func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, position: ToastPosition = ToastManager.shared.position, title: String? = nil, image: UIImage? = nil, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)? = nil) {
+   func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, position: ToastPosition = ToastManager.shared.position, title: String? = nil, image: UIImage? = nil, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)? = nil) {
         do {
             let toast = try toastViewForMessage(message, title: title, image: image, style: style)
             showToast(toast, duration: duration, position: position, completion: completion)
@@ -127,7 +127,7 @@ public extension UIView {
      @param completion The completion closure, executed after the toast view disappears.
             didTap will be `true` if the toast view was dismissed from a tap.
      */
-  @objc func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, point: CGPoint, title: String?, image: UIImage?, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)?) {
+    func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, point: CGPoint, title: String?, image: UIImage?, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)?) {
         do {
             let toast = try toastViewForMessage(message, title: title, image: image, style: style)
             showToast(toast, duration: duration, point: point, completion: completion)
@@ -135,7 +135,26 @@ public extension UIView {
             print("Error: message, title, and image cannot all be nil")
         } catch {}
     }
-    
+
+
+    @objc func makeToast(with message: String?) {
+        makeToast(message, duration: ToastManager.shared.duration, position: ToastManager.shared.position, title: nil, image: nil,style: ToastManager.shared.style,completion: nil)
+    }
+
+    @objc func makeToast(with message: String?, point: CGPoint) {
+        makeToast(message, duration: ToastManager.shared.duration, point: point, title: nil, image: nil,style: ToastManager.shared.style,completion: nil)
+    }
+
+    @objc func makeToast(with message: String?, offset: CGPoint) {
+            do {
+                let toast = try toastViewForMessage(message, title: nil, image: nil, style: ToastManager.shared.style)
+                showToast(toast, duration: ToastManager.shared.duration, position: ToastManager.shared.position, completion: nil, offset: offset)
+            } catch ToastError.missingParameters {
+                print("Error: message, title, and image cannot all be nil")
+            } catch {}
+        }
+
+
     // MARK: - Show Toast Methods
     
     /**
@@ -153,6 +172,13 @@ public extension UIView {
         let point = position.centerPoint(forToast: toast, inSuperview: self)
         showToast(toast, duration: duration, point: point, completion: completion)
     }
+
+    @objc func showToast(_ toast: UIView, duration: TimeInterval = ToastManager.shared.duration, position: ToastPosition = ToastManager.shared.position, completion: ((_ didTap: Bool) -> Void)? = nil, offset: CGPoint = CGPoint.zero) {
+            var point = position.centerPoint(forToast: toast, inSuperview: self)
+            point.x = point.x + offset.x
+            point.y = point.y + offset.y
+            showToast(toast, duration: duration, point: point, completion: completion)
+   }
     
     /**
      Displays any view as toast at a provided center point and duration. The completion closure
@@ -772,6 +798,12 @@ public enum ToastPosition: Int {
     case top
     case center
     case bottom
+    case topLeft
+    case topRight
+    case centerLeft
+    case centerRight
+    case bottomLeft
+    case bottomRight
     
     fileprivate func centerPoint(forToast toast: UIView, inSuperview superview: UIView) -> CGPoint {
         let topPadding: CGFloat = ToastManager.shared.style.verticalPadding + superview.csSafeAreaInsets.top
@@ -780,10 +812,22 @@ public enum ToastPosition: Int {
         switch self {
         case .top:
             return CGPoint(x: superview.bounds.size.width / 2.0, y: (toast.frame.size.height / 2.0) + topPadding)
+        case .topLeft:
+            return CGPoint(x: 0.0, y: (toast.frame.size.height / 2.0) + topPadding)
+        case .topRight:
+            return CGPoint(x: superview.bounds.size.width, y: (toast.frame.size.height / 2.0) + topPadding)
         case .center:
             return CGPoint(x: superview.bounds.size.width / 2.0, y: superview.bounds.size.height / 2.0)
+        case .centerLeft:
+            return CGPoint(x: 0.0, y: superview.bounds.size.height / 2.0)
+        case .centerRight:
+            return CGPoint(x: superview.bounds.size.width, y: superview.bounds.size.height / 2.0)
         case .bottom:
             return CGPoint(x: superview.bounds.size.width / 2.0, y: (superview.bounds.size.height - (toast.frame.size.height / 2.0)) - bottomPadding)
+        case .bottomLeft:
+            return CGPoint(x: superview.bounds.size.width / 0.0, y: (superview.bounds.size.height - (toast.frame.size.height / 2.0)) - bottomPadding)
+        case .bottomRight:
+            return CGPoint(x: superview.bounds.size.width, y: (superview.bounds.size.height - (toast.frame.size.height / 2.0)) - bottomPadding)
         }
     }
 }
