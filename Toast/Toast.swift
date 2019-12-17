@@ -720,7 +720,7 @@ public class ToastManager: NSObject {
             if(ToastManager.instance == nil){
                 ToastManager.instance = ToastManager()
             }
-            return ToastManager!.instance
+            return ToastManager.instance!
         }
     }
     
