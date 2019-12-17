@@ -708,12 +708,21 @@ public class ToastStyle: NSObject {
 @objcMembers
 @objc(ToastManager)
 public class ToastManager: NSObject {
-    
+
+
+    static var instance: ToastManager?
     /**
      The `ToastManager` singleton instance.
      
      */
-    public static let shared = ToastManager()
+    public static var shared {
+        get {
+            if(ToastManager.instance == nil){
+                ToastManager.instance = ToastManager()
+            }
+            return ToastManager.instance
+        }
+    }
     
     /**
      The shared style. Used whenever toastViewForMessage(message:title:image:style:) is called
