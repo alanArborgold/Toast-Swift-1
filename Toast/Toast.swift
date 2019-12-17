@@ -715,7 +715,7 @@ public class ToastManager: NSObject {
      The `ToastManager` singleton instance.
      
      */
-    public static var shared {
+    public static var shared: ToastManager {
         get {
             if(ToastManager.instance == nil){
                 ToastManager.instance = ToastManager()
